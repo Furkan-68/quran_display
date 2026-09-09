@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quran Karaoke — word-by-word</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header class="toolbar">
+      <div class="toolbar-row">
+        <label class="field">
+          <span>Surah</span>
+          <select id="surah-select"></select>
+        </label>
+
+        <label class="field">
+          <span>Ayah</span>
+          <select id="ayah-select"></select>
+        </label>
+
+        <label class="field grow">
+          <span>Reciter</span>
+          <select id="reciter-select"></select>
+        </label>
+
+        <label class="field">
+          <span>Word gloss</span>
+          <select id="lang-select"></select>
+        </label>
+
+        <button id="zen-toggle" class="ghost" type="button" aria-pressed="false" title="Focus mode (Z)">
+          Focus
+        </button>
+        <button id="settings-toggle" class="ghost" type="button" aria-expanded="false">Settings</button>
+      </div>
+
+      <div class="toolbar-row settings" id="settings-row" hidden>
+        <label class="field">
+          <span>Speed <output id="rate-out">1.00×</output></span>
+          <input id="rate" type="range" min="0.5" max="1.5" step="0.05" value="1" />
+        </label>
+
+        <label class="field">
+          <span>Sync offset <output id="offset-out">0 ms</output></span>
+          <input id="offset" type="range" min="-500" max="500" step="10" value="0" />
+        </label>
+
+        <label class="field">
+          <span>Font size <output id="font-out">100%</output></span>
+          <input id="font-size" type="range" min="70" max="180" step="5" value="100" />
+        </label>
+
+        <label class="field">
+          <span>Repeat ayah</span>
+          <select id="repeat">
+            <option value="0">off</option>
+            <option value="2">2×</option>
+            <option value="3">3×</option>
+            <option value="5">5×</option>
+            <option value="Infinity">endless</option>
+          </select>
+        </label>
+
+        <div class="field range-field">
+          <span>Loop range</span>
+          <div class="range-inputs">
+            <input id="range-on" type="checkbox" aria-label="Enable loop range" />
+            <input id="range-from" type="number" min="1" value="1" aria-label="First ayah" />
+            <span class="dash">–</span>
+            <input id="range-to" type="number" min="1" value="1" aria-label="Last ayah" />
+          </div>
+        </div>
+
+        <div class="field toggles">
+          <span>Display</span>
+          <div class="toggle-row">
+            <label><input id="toggle-single" type="checkbox" checked /> One ayah</label>
+            <label><input id="toggle-mushaf" type="checkbox" /> Mushaf lines</label>
+            <label><input id="toggle-translit" type="checkbox" checked /> Transliteration</label>
+            <label><input id="toggle-gloss" type="checkbox" checked /> Word gloss</label>
+            <label><input id="toggle-scroll" type="checkbox" checked /> Auto-scroll</label>
+            <label><input id="toggle-theme" type="checkbox" /> Dark</label>
+          </div>
+        </div>
+
+        <div class="field toggles">
+          <span>Glosses</span>
+          <div class="toggle-row">
+            <label><input id="toggle-edit" type="checkbox" /> Edit words</label>
+            <button id="export-glosses" class="ghost small" type="button">Export edits</button>
+            <span id="gloss-count" class="hint"></span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <button id="zen-exit" class="zen-exit" type="button" hidden>Esc — leave focus mode</button>
+
+    <main>
+      <div id="banner" class="banner" hidden></div>
+      <div id="status" class="status">Loading…</div>
+      <div id="surah" class="surah cards" dir="rtl" lang="ar"></div>
+      <p class="credits">
+        Word data and recitation segments from the
+        <a href="https://qul.tarteel.ai" target="_blank" rel="noreferrer">Quranic Universal Library</a>
+        (Tarteel AI) and <a href="https://api.quran.com" target="_blank" rel="noreferrer">api.quran.com</a>.
+      </p>
+    </main>
+
+    <footer class="playbar">
+      <div class="focus" id="focus">
+        <span class="focus-key" id="focus-key"></span>
+        <span class="focus-ar" id="focus-ar"></span>
+        <span class="focus-tl" id="focus-tl"></span>
+        <span class="focus-gl" id="focus-gl"></span>
+        <span class="focus-en" id="focus-en" hidden></span>
+      </div>
+
+      <div class="transport">
+        <button id="prev" class="round" type="button" title="Previous ayah (←)" aria-label="Previous ayah">‹</button>
+        <button id="play" class="round primary" type="button" title="Play / pause (Space)" aria-label="Play">▶</button>
+        <button id="next" class="round" type="button" title="Next ayah (→)" aria-label="Next ayah">›</button>
+
+        <span class="time" id="time">0:00</span>
+        <input id="seek" class="seek" type="range" min="0" max="1000" value="0" aria-label="Seek" />
+        <span class="time" id="duration">0:00</span>
+        <span class="badge" id="mode-badge"></span>
+      </div>
+    </footer>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

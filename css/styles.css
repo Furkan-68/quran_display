@@ -1,0 +1,756 @@
+:root {
+  color-scheme: light;
+
+  /* Light palette: deep teal on warm cream.
+     #f0ebdb page · #ffffff panels · #004c56 ink and accent · #a2c2c0 lines and the active word
+     · #88a7a5 rings. The two text tints below are mixed from the same teal and cream so small
+     text keeps enough contrast on the cream — #88a7a5 itself only reaches 2.2:1 there, which is
+     fine for a border and not for a word. */
+  --teal: #004c56;
+  --cream: #f0ebdb;
+  --sage: #a2c2c0;
+  --sage-deep: #88a7a5;
+
+  --bg: var(--cream);
+  --panel: #ffffff;
+  --panel-2: color-mix(in srgb, var(--sage) 28%, #ffffff);
+  --border: var(--sage);
+  --fg: var(--teal);
+  --fg-2: color-mix(in srgb, var(--teal) 82%, var(--cream));
+  --muted: color-mix(in srgb, var(--teal) 75%, var(--cream));
+  --accent: var(--teal);
+  --accent-soft: var(--sage);
+  --accent-ring: var(--sage-deep);
+  --shadow: 0 1px 3px rgba(0, 76, 86, 0.1), 0 8px 24px rgba(0, 76, 86, 0.08);
+  --scale: 1;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #14161a;
+  --panel: #1b1e24;
+  --panel-2: #22262e;
+  --border: #2e333c;
+  --fg: #eceef2;
+  --fg-2: #c2c7d0;
+  --muted: #7e8794;
+  --accent: #3ddc9a;
+  --accent-soft: #14382c;
+  --accent-ring: #2f8f6c;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+}
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+/* ------------------------------------------------------------------ toolbar */
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.6rem 1rem;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+/* A class-level `display: flex` outranks the user-agent rule for [hidden], so say it explicitly —
+   without this the Settings button toggles the attribute with no visible effect. */
+.toolbar-row[hidden] {
+  display: none;
+}
+
+.toolbar-row + .toolbar-row {
+  margin-top: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed var(--border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.field > span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.field.grow {
+  flex: 1 1 16rem;
+}
+
+select,
+input[type='number'] {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.4rem 0.55rem;
+  max-width: 100%;
+}
+
+input[type='range'] {
+  accent-color: var(--accent);
+  width: 9rem;
+}
+
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.range-inputs input[type='number'] {
+  width: 4.5rem;
+}
+
+.toggles .toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding-top: 0.2rem;
+}
+
+.toggle-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+.ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  cursor: pointer;
+}
+
+.ghost:hover {
+  background: var(--panel-2);
+}
+
+/* --------------------------------------------------------------------- page */
+
+main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem calc(var(--chrome-bottom, 7rem) + 3rem);
+}
+
+.status,
+.banner {
+  border-radius: 0.7rem;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.status {
+  background: var(--panel-2);
+  color: var(--fg-2);
+}
+
+.status[hidden] {
+  display: none;
+}
+
+.banner {
+  background: #fdecec;
+  border: 1px solid #f3c2c2;
+  color: #7c2222;
+}
+
+[data-theme='dark'] .banner {
+  background: #3a1d1d;
+  border-color: #63302f;
+  color: #ffc9c4;
+}
+
+.credits {
+  margin-top: 2rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.credits a {
+  color: var(--accent);
+}
+
+/* -------------------------------------------------------------------- surah */
+
+.surah {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.verse {
+  position: relative;
+  border: 1px solid transparent;
+  border-radius: 0.9rem;
+  padding: 0.65rem 0.8rem 0.5rem;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.verse.active {
+  background: var(--panel);
+  border-color: var(--border);
+  box-shadow: var(--shadow);
+}
+
+.verse-key {
+  direction: ltr;
+  text-align: left;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 0.2rem;
+}
+
+.verse.active .verse-key {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.verse.untimed .verse-key::after {
+  content: ' · no timing';
+}
+
+.verse-words {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.35rem 0.2rem;
+}
+
+.word {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem 0.45rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 0.6rem;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s ease, color 0.12s ease, transform 0.12s ease;
+}
+
+.word:hover {
+  background: var(--panel-2);
+}
+
+.word:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
+
+/* Amiri Quran sets its vowel marks well above and below the baseline, so the Arabic line needs
+   far more room than a Latin one before the transliteration underneath stops colliding with it. */
+.word .ar {
+  font-family: 'Amiri Quran', 'Scheherazade New', serif;
+  font-size: calc(1.85rem * var(--scale));
+  line-height: 2.1;
+  padding-bottom: calc(0.35rem * var(--scale));
+  color: var(--fg);
+}
+
+.word .tl {
+  direction: ltr;
+  font-size: calc(0.7rem * var(--scale));
+  line-height: 1.4;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.word .gl {
+  direction: ltr;
+  font-size: calc(0.76rem * var(--scale));
+  color: var(--fg-2);
+  max-width: 11rem;
+}
+
+.word .gl.fallback {
+  opacity: 0.45;
+  font-style: italic;
+}
+
+.word.read .ar {
+  color: var(--muted);
+}
+
+.word.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-ring);
+  transform: translateY(-1px);
+}
+
+.word.active .ar {
+  color: var(--accent);
+}
+
+.word.active .gl,
+.word.active .tl {
+  color: var(--fg);
+}
+
+.end-marker {
+  align-self: center;
+  font-family: 'Amiri Quran', serif;
+  font-size: calc(1.5rem * var(--scale));
+  color: var(--muted);
+  padding: 0 0.3rem;
+}
+
+/* One-ayah mode: only the ayah being recited is on screen, centred, and it flips to the next
+   one by itself because the active verse is whatever the audio has reached. */
+/* --chrome-top / --chrome-bottom are measured from the real toolbar and play bar in app.js, so
+   the ayah centres in the space actually left over — whatever the font size, whether the settings
+   row is open, and zero for both in focus mode. */
+.surah.single {
+  justify-content: center;
+  min-height: calc(100dvh - var(--chrome-top, 7rem) - var(--chrome-bottom, 7rem) - 2.5rem);
+}
+
+/* Enough clearance that a long ayah at a large font size scrolls clear of the play bar rather
+   than hiding behind it. */
+main:has(.surah.single) {
+  padding-bottom: calc(var(--chrome-bottom, 7rem) + 1.5rem);
+}
+
+.surah.single .verse {
+  display: none;
+}
+
+.surah.single .verse.active {
+  display: block;
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  padding: 0.5rem;
+}
+
+.surah.single .verse-key {
+  text-align: center;
+  font-size: 0.8rem;
+}
+
+.surah.single .verse-words {
+  justify-content: center;
+  gap: 0.5rem 0.3rem;
+}
+
+.surah.single .word .ar {
+  font-size: calc(2.6rem * var(--scale));
+}
+
+.surah.single .word .tl {
+  font-size: calc(0.85rem * var(--scale));
+}
+
+.surah.single .word .gl {
+  font-size: calc(0.92rem * var(--scale));
+  max-width: 14rem;
+}
+
+.surah.single.mushaf .word .ar {
+  font-size: calc(3.1rem * var(--scale));
+}
+
+.surah.single .end-marker {
+  font-size: calc(2rem * var(--scale));
+}
+
+/* Mushaf mode: continuous Arabic lines, meanings only in the focus panel. */
+.surah.mushaf .verse-words {
+  gap: 0 0.1rem;
+  line-height: 2.1;
+}
+
+.surah.mushaf .word {
+  padding: 0.05rem 0.25rem;
+}
+
+.surah.mushaf .word .tl,
+.surah.mushaf .word .gl,
+.surah.no-translit .word .tl,
+.surah.no-gloss .word .gl {
+  display: none;
+}
+
+.surah.mushaf .word .ar {
+  font-size: calc(2.15rem * var(--scale));
+}
+
+/* ------------------------------------------------------------ gloss editing */
+
+.ghost.small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+/* A word whose gloss was written by hand keeps a quiet marker, so corrections are visible. */
+.word.edited .gl {
+  border-bottom: 1px dotted var(--accent-ring);
+}
+
+.surah.editing .word {
+  cursor: text;
+}
+
+.surah.editing .word .gl.fallback {
+  outline: 1px dashed var(--accent-ring);
+  outline-offset: 2px;
+  border-radius: 0.2rem;
+  opacity: 0.7;
+}
+
+.gloss-editor {
+  position: fixed;
+  z-index: 50;
+  width: min(22rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  box-shadow: var(--shadow);
+  padding: 0.75rem 0.85rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gloss-editor[hidden] {
+  display: none;
+}
+
+.ge-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.ge-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0 0.2rem;
+}
+
+.ge-ar {
+  font-family: 'Amiri Quran', serif;
+  font-size: 2rem;
+  line-height: 2;
+  text-align: center;
+  color: var(--fg);
+}
+
+.ge-meta {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+}
+
+.ge-tl {
+  font-style: italic;
+  color: var(--muted);
+}
+
+.ge-en {
+  color: var(--fg-2);
+}
+
+.ge-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  width: 100%;
+}
+
+.ge-input:focus {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 1px;
+}
+
+.ge-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.ge-actions button {
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  border-radius: 0.45rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.ge-save {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff;
+}
+
+[data-theme='dark'] .ge-save {
+  color: #08130e;
+}
+
+.ge-next-gap {
+  margin-left: auto;
+}
+
+.ge-hint {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+/* --------------------------------------------------------------- focus mode */
+/* Everything goes except the ayah itself — toolbar, play bar, the word line under it, credits.
+   Playback stays on the keyboard (Space, arrows) and on clicking a word. An error banner is
+   deliberately still allowed through, otherwise a failed load would show a blank screen. */
+body.zen .toolbar,
+body.zen .playbar,
+body.zen .credits,
+body.zen .status {
+  display: none;
+}
+
+body.zen main,
+body.zen main:has(.surah.single) {
+  padding: 1rem;
+  max-width: none;
+}
+
+body.zen .surah.single {
+  min-height: calc(100dvh - 2rem);
+}
+
+body.zen .surah.single .word .ar {
+  font-size: calc(2.9rem * var(--scale));
+}
+
+body.zen .surah.single.mushaf .word .ar {
+  font-size: calc(3.4rem * var(--scale));
+}
+
+/* The way out stays hidden until the pointer moves, like the chrome on a video player. */
+.zen-exit {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 40;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  padding: 0.35rem 0.8rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+body.zen-chrome .zen-exit {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.zen-exit:hover {
+  color: var(--fg);
+}
+
+/* ------------------------------------------------------------------ playbar */
+
+.playbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  padding: 0.55rem 1rem 0.7rem;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.06);
+}
+
+.focus {
+  max-width: 1180px;
+  margin: 0 auto 0.35rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.75rem;
+  min-height: 2.6rem;
+}
+
+.focus-key {
+  direction: ltr;
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-ar {
+  font-family: 'Amiri Quran', serif;
+  font-size: 1.9rem;
+  line-height: 1.7;
+  color: var(--accent);
+}
+
+.focus-tl {
+  font-style: italic;
+  color: var(--muted);
+}
+
+.focus-gl {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.focus-gl.fallback {
+  opacity: 0.55;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.focus-en {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.transport {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.round {
+  width: 2.3rem;
+  height: 2.3rem;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+}
+
+.round:hover {
+  background: var(--panel-2);
+}
+
+.round.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  width: 2.7rem;
+  height: 2.7rem;
+  font-size: 1.2rem;
+}
+
+[data-theme='dark'] .round.primary {
+  color: #08130e;
+}
+
+.seek {
+  flex: 1;
+  width: auto;
+}
+
+.time {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.8rem;
+  min-width: 3.2rem;
+  text-align: center;
+}
+
+.badge {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .word .gl {
+    max-width: 7rem;
+  }
+
+  .focus-ar {
+    font-size: 1.5rem;
+  }
+
+  .badge {
+    display: none;
+  }
+
+  main {
+    padding-bottom: 14rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
